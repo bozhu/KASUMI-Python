@@ -121,6 +121,9 @@ class Kasumi:
 
         assert _bitlen(left)  <= 7
         assert _bitlen(right) <= 9
+
+        #print 'FI', hex((left << 9) | right)
+
         return (left << 9) | right
 
 
@@ -141,10 +144,13 @@ class Kasumi:
 
         out_left  = in_right
         out_right = self.fun_FI(in_left ^ self.key_KO3[round_i], 
-                                          self.key_KI3[round_i]) ^ out_right
+                                          self.key_KI3[round_i]) ^ in_right
 
         assert _bitlen(out_left)  <= 16
         assert _bitlen(out_right) <= 16
+
+        # print 'FO', hex((out_left << 16) | out_right)
+
         return (out_left << 16) | out_right
 
 
@@ -156,10 +162,13 @@ class Kasumi:
         in_right = input & 0xFFFF
 
         out_right = in_right ^ _shift(in_left   & self.key_KL1[round_i], 1)
-        out_left  = in_left  ^ _shift(out_right & self.key_KL2[round_i], 1)
+        out_left  = in_left  ^ _shift(out_right | self.key_KL2[round_i], 1)
 
         assert _bitlen(out_left)  <= 16
         assert _bitlen(out_right) <= 16
+
+        # print 'FL', hex((out_left << 16) | out_right)
+
         return (out_left << 16) | out_right
 
 
@@ -175,6 +184,9 @@ class Kasumi:
             output = self.fun_FL(state, round_i)
 
         assert _bitlen(output) <= 32
+
+        # print 'f', hex(output)
+
         return output
 
 
@@ -184,8 +196,14 @@ class Kasumi:
         assert round_i >= 1 and round_i <= 8
 
         out_right = in_left # note this is different from normal Feistel
-        out_left  = self.fun_f(in_left, round_i) ^ in_right
+        test = self.fun_f(in_left, round_i)
 
+        print 'right f\t\t', hex(in_right), hex(test)
+
+        out_left  = in_right ^ test
+        print bin(out_left)
+
+        # print 'left right\t', hex(out_left), hex(out_right)
         assert _bitlen(out_left)  <= 32
         assert _bitlen(out_right) <= 32
         return out_left, out_right
@@ -210,6 +228,7 @@ class Kasumi:
         right = plaintext & 0xFFFFFFFF
         for i in range(1, 9):
             left, right = self.enc_1r(left, right, i)
+            #print hex(left), hex(right)
         return (left << 32) | right
 
 
@@ -223,11 +242,12 @@ class Kasumi:
 
 
 if __name__ == '__main__':
-    key     = 0
-    plain   = 0
+    key     = 0x9900aabbccddeeff1122334455667788    
+    plain   = 0xfedcba0987654321
 
     my_kasumi = Kasumi()
     my_kasumi.set_key(key)
+
     for x in my_kasumi.key_KL1[1:]:
         print hex(x),
     print

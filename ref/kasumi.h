@@ -16,4 +16,6 @@ u16 KLi1[8], KLi2[8];
 u16 KOi1[8], KOi2[8], KOi3[8];
 u16 KIi1[8], KIi2[8], KIi3[8];
 
+#include <stdio.h>
+
 #endif //__KASUMI_H__

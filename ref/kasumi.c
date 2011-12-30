@@ -95,6 +95,9 @@ static u16 FI( u16 in, u16 subkey )
     nine = (u16)(S9[nine] ^ seven);
     seven = (u16)(S7[seven] ^ (nine & 0x7F));
     in = (u16)((seven<<9) + nine);
+
+//    printf("FI %x\n", in);
+
     return( in );
 }
 /*---------------------------------------------------------------------
@@ -120,6 +123,9 @@ static u32 FO( u32 in, int index )
     left = FI( left, KIi3[index] );
     left ^= right;
     in = (((u32)right)<<16)+left;
+
+    printf("FO %x\n", in);
+
     return( in );
 }
 /*---------------------------------------------------------------------
@@ -141,6 +147,9 @@ static u32 FL( u32 in, int index )
     l ^= ROL16(b,1);
     /* put the two halves back together */
     in = (((u32)l)<<16) + r;
+
+    //printf("FL %x\n", in);
+
     return( in );
 }
 /*---------------------------------------------------------------------
@@ -162,10 +171,21 @@ void Kasumi( u8 *data )
     n = 0;
     do{ temp = FL( left, n );
         temp = FO( temp, n++ );
+
+        printf("right f \t%x %x\n", right, temp);
+
         right ^= temp;
+
+        printf("left right\t%x %x\n", right, left);
+
         temp = FO( right, n );
         temp = FL( temp, n++ );
+
+        printf("right f \t%x %x\n", left, temp);
+
         left ^= temp;
+
+        printf("left right\t%x %x\n", left, right);
     }while( n<=7 );
     /* return the correct endian result */
     d[0].b8[0] = (u8)(left>>24); d[1].b8[0] = (u8)(right>>24);

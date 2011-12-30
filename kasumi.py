@@ -228,6 +228,31 @@ if __name__ == '__main__':
 
     my_kasumi = Kasumi()
     my_kasumi.set_key(key)
+    for x in my_kasumi.key_KL1[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KL2[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KO1[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KO2[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KO3[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KI1[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KI2[1:]:
+        print hex(x),
+    print
+    for x in my_kasumi.key_KI3[1:]:
+        print hex(x),
+    print
+
     cipher = my_kasumi.enc(plain)
     print hex(cipher)
 

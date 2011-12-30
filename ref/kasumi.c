@@ -27,9 +27,12 @@ typedef union {
     u8 b8[2];
 } WORD;
 /*-------- globals: The subkey arrays -----------------------------------*/
-static u16 KLi1[8], KLi2[8];
-static u16 KOi1[8], KOi2[8], KOi3[8];
-static u16 KIi1[8], KIi2[8], KIi3[8];
+//static u16 KLi1[8], KLi2[8];
+//static u16 KOi1[8], KOi2[8], KOi3[8];
+//static u16 KIi1[8], KIi2[8], KIi3[8];
+extern u16 KLi1[8], KLi2[8];
+extern u16 KOi1[8], KOi2[8], KOi3[8];
+extern u16 KIi1[8], KIi2[8], KIi3[8];
 /*---------------------------------------------------------------------
  * FI()
  * The FI function (fig 3). It includes the S7 and S9 tables.

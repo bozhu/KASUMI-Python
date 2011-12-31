@@ -95,7 +95,7 @@ class Kasumi:
 
 
     def fun_FI(self, input, round_key):
-        assert _bitlen(input)  <= 16
+        # assert _bitlen(input)  <= 16
         
         left  = input >> 7
         right = input & 0b1111111
@@ -104,32 +104,29 @@ class Kasumi:
         round_key_2 = round_key & 0b111111111
 
         tmp_l = right
-        assert _bitlen(left)  <= 9
+        # assert _bitlen(left)  <= 9
         tmp_r = S9[left] ^ right
 
         left  = tmp_r ^ round_key_2
-        assert _bitlen(tmp_l) <= 7
+        # assert _bitlen(tmp_l) <= 7
         right = S7[tmp_l] ^ (tmp_r & 0b1111111) ^ round_key_1
 
         tmp_l = right
-        assert _bitlen(left)  <= 9
+        # assert _bitlen(left)  <= 9
         tmp_r = S9[left] ^ right
 
-        assert _bitlen(tmp_l) <= 7
+        # assert _bitlen(tmp_l) <= 7
         left  = S7[tmp_l] ^ (tmp_r & 0b1111111)
         right = tmp_r
 
-        assert _bitlen(left)  <= 7
-        assert _bitlen(right) <= 9
-
-        #print 'FI', hex((left << 9) | right)
-
+        # assert _bitlen(left)  <= 7
+        # assert _bitlen(right) <= 9
         return (left << 9) | right
 
 
     def fun_FO(self, input, round_i):
-        assert _bitlen(input)  <= 32
-        assert round_i >= 1 and round_i <= 8
+        # assert _bitlen(input)  <= 32
+        # assert round_i >= 1 and round_i <= 8
 
         in_left  = input >> 16
         in_right = input & 0xFFFF
@@ -146,17 +143,14 @@ class Kasumi:
         out_right = self.fun_FI(in_left ^ self.key_KO3[round_i], 
                                           self.key_KI3[round_i]) ^ in_right
 
-        assert _bitlen(out_left)  <= 16
-        assert _bitlen(out_right) <= 16
-
-        # print 'FO', hex((out_left << 16) | out_right)
-
+        # assert _bitlen(out_left)  <= 16
+        # assert _bitlen(out_right) <= 16
         return (out_left << 16) | out_right
 
 
     def fun_FL(self, input, round_i):
-        assert _bitlen(input)  <= 32
-        assert round_i >= 1 and round_i <= 8
+        # assert _bitlen(input)  <= 32
+        # assert round_i >= 1 and round_i <= 8
 
         in_left  = input >> 16
         in_right = input & 0xFFFF
@@ -164,17 +158,14 @@ class Kasumi:
         out_right = in_right ^ _shift(in_left   & self.key_KL1[round_i], 1)
         out_left  = in_left  ^ _shift(out_right | self.key_KL2[round_i], 1)
 
-        assert _bitlen(out_left)  <= 16
-        assert _bitlen(out_right) <= 16
-
-        # print 'FL', hex((out_left << 16) | out_right)
-
+        # assert _bitlen(out_left)  <= 16
+        # assert _bitlen(out_right) <= 16
         return (out_left << 16) | out_right
 
 
     def fun_f(self, input, round_i):
-        assert _bitlen(input)  <= 32
-        assert round_i >= 1 and round_i <= 8
+        # assert _bitlen(input)  <= 32
+        # assert round_i >= 1 and round_i <= 8
 
         if round_i % 2 == 1:
             state  = self.fun_FL(input, round_i)
@@ -183,42 +174,33 @@ class Kasumi:
             state  = self.fun_FO(input, round_i)
             output = self.fun_FL(state, round_i)
 
-        assert _bitlen(output) <= 32
-
-        # print 'f', hex(output)
-
+        # assert _bitlen(output) <= 32
         return output
 
 
     def enc_1r(self, in_left, in_right, round_i):
-        assert _bitlen(in_left)  <= 32
-        assert _bitlen(in_right) <= 32
-        assert round_i >= 1 and round_i <= 8
+        # assert _bitlen(in_left)  <= 32
+        # assert _bitlen(in_right) <= 32
+        # assert round_i >= 1 and round_i <= 8
 
         out_right = in_left # note this is different from normal Feistel
-        test = self.fun_f(in_left, round_i)
+        out_left  = in_right ^ self.fun_f(in_left, round_i)
 
-        print 'right f\t\t', hex(in_right), hex(test)
-
-        out_left  = in_right ^ test
-        print bin(out_left)
-
-        # print 'left right\t', hex(out_left), hex(out_right)
-        assert _bitlen(out_left)  <= 32
-        assert _bitlen(out_right) <= 32
+        # assert _bitlen(out_left)  <= 32
+        # assert _bitlen(out_right) <= 32
         return out_left, out_right
 
 
     def dec_1r(self, in_left, in_right, round_i):
-        assert _bitlen(in_left)  <= 32
-        assert _bitlen(in_right) <= 32
-        assert round_i >= 1 and round_i <= 8
+        # assert _bitlen(in_left)  <= 32
+        # assert _bitlen(in_right) <= 32
+        # assert round_i >= 1 and round_i <= 8
 
         out_left  = in_right
         out_right = self.fun_f(in_right, round_i) ^ in_left
 
-        assert _bitlen(out_left)  <= 32
-        assert _bitlen(out_right) <= 32
+        # assert _bitlen(out_left)  <= 32
+        # assert _bitlen(out_right) <= 32
         return out_left, out_right
 
 
@@ -228,7 +210,6 @@ class Kasumi:
         right = plaintext & 0xFFFFFFFF
         for i in range(1, 9):
             left, right = self.enc_1r(left, right, i)
-            #print hex(left), hex(right)
         return (left << 32) | right
 
 
@@ -237,42 +218,27 @@ class Kasumi:
         left  = ciphertext >> 32
         right = ciphertext & 0xFFFFFFFF
         for i in range(8, 0, -1):
-            left, right = self.enc_1r(left, right, i)
+            left, right = self.dec_1r(left, right, i)
         return (left << 32) | right
 
 
 if __name__ == '__main__':
     key     = 0x9900aabbccddeeff1122334455667788    
-    plain   = 0xfedcba0987654321
+    text    = 0xfedcba0987654321
 
     my_kasumi = Kasumi()
     my_kasumi.set_key(key)
 
-    for x in my_kasumi.key_KL1[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KL2[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KO1[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KO2[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KO3[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KI1[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KI2[1:]:
-        print hex(x),
-    print
-    for x in my_kasumi.key_KI3[1:]:
-        print hex(x),
-    print
+    encrypted = my_kasumi.enc(text)
+    print 'encrypted', hex(encrypted)
 
-    cipher = my_kasumi.enc(plain)
-    print hex(cipher)
+    for i in range(99): # for testing
+        encrypted = my_kasumi.enc(encrypted)
+    for i in range(99):
+        encrypted = my_kasumi.dec(encrypted)
+
+    decrypted = my_kasumi.dec(encrypted)
+    print 'decrypted', hex(decrypted)
+
+
 

@@ -16,6 +16,7 @@ int main(void)
     };
 
     KeySchedule(key);
+    /*
     for (i = 0; i < 8; i++)
         printf("%04x ", KLi1[i]);
     printf("\n");
@@ -40,10 +41,11 @@ int main(void)
     for (i = 0; i < 8; i++)
         printf("%04x ", KIi3[i]);
     printf("\n");
+    */
 
     Kasumi(text);
 
-    printf("\n");
+    //printf("\n");
     for (i = 0; i < 8; i++)
         printf("%02x ", text[i]);
     printf("\n");
